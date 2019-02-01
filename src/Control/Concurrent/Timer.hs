@@ -15,11 +15,13 @@ module Control.Concurrent.Timer (
 
 import Protolude hiding (async)
 
-import Control.Concurrent.Async
+import Control.Concurrent.Async (async, uninterruptibleCancel)
 import Control.Concurrent.STM
-import System.Random (StdGen, randomR, mkStdGen)
-
-import Numeric.Natural
+  ( TMVar, newTMVar, newEmptyTMVar, readTMVar, tryPutTMVar, tryTakeTMVar
+  , TVar, newTVar, readTVar, writeTVar
+  )
+import Numeric.Natural (Natural)
+import System.Random (StdGen, mkStdGen, randomR, randomRIO)
 
 data Timer = Timer
   { timerAsync :: TMVar (Async ())
@@ -30,15 +32,23 @@ data Timer = Timer
   , timerRange :: (Natural, Natural)
   }
 
--- | Create a new timer with the supplied timer action and timer length,
+-- | Create a new timer with the supplied timeout
 newTimer :: MonadIO m => Natural -> m Timer
-newTimer timeout = newTimerRange 0 (timeout, timeout)
+newTimer timeout = flip newTimer' timeout =<< randomInt
 
--- | Create a new timer with the supplied timer action, random seed, and range
--- from which the the timer will choose a random timer length at each
--- start or reset.
-newTimerRange :: MonadIO m => Int -> (Natural, Natural) -> m Timer
-newTimerRange seed timeoutRange = do
+-- | Create a new timer with a random seed and the supplied timeout
+newTimer' :: MonadIO m => Int -> Natural -> m Timer
+newTimer' seed timeout = newTimerRange' seed (timeout, timeout)
+
+-- | Create a new timer with the supplied range from which the the timer will
+-- choose a random timer length at each start or reset.
+newTimerRange :: MonadIO m => (Natural, Natural) -> m Timer
+newTimerRange timeoutRange = flip newTimerRange' timeoutRange =<< randomInt
+
+-- | Create a new timer with a random seed and the supplied range from which the
+-- the timer will choose a random timer length at each start or reset.
+newTimerRange' :: MonadIO m => Int -> (Natural, Natural) -> m Timer
+newTimerRange' seed timeoutRange = do
   (timerAsync, timerLock, timerGen) <-
     liftedAtomically $ (,,) <$>
       newEmptyTMVar <*> newTMVar () <*> newTVar (mkStdGen seed)
@@ -108,6 +118,9 @@ runTimer' timer = do
     Right () -> Right <$> waitTimer timer
 
 --------------------------------------------------------------------------------
+
+randomInt :: MonadIO m => m Int
+randomInt = liftIO $ randomRIO (minBound, maxBound)
 
 randomDelay :: MonadIO m => Timer -> m Int
 randomDelay timer = liftedAtomically $ do
