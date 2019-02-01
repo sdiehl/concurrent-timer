@@ -1,0 +1,4 @@
+.stack-work/
+concurrent-timer.cabal
+*.sw[ponm]
+*~
