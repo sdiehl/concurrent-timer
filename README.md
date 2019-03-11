@@ -1,5 +1,7 @@
 # concurrent-timer
 
+[![CircleCI](https://circleci.com/gh/adjoint-io/concurrent-timer/tree/master.svg?style=svg&circle-token=4d9ec1581c345d0cba38dd455643d25c0b196f84)](https://circleci.com/gh/adjoint-io/concurrent-timer/tree/master)
+
 A concurrent timer library.
 
 ## Usage
