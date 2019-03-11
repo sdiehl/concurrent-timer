@@ -1,3 +1,5 @@
 # Changelog for concurrent-timer
 
-## Unreleased changes
+## 0.1
+
+* Initial release.

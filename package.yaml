@@ -1,10 +1,10 @@
 name:                concurrent-timer
 version:             0.1.0.0
-github:              "githubuser/concurrent-timer"
+github:              "adjoint-io/concurrent-timer"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+author:              "Adjoint Inc"
+maintainer:          "info@adjoint.io"
+copyright:           "2019-2019 Adjoint Inc"
 
 extra-source-files:
 - README.md
